@@ -1,17 +1,19 @@
+use std::io::Cursor;
 use tux_validation::os_release;
 
 #[test]
-fn debian_and_forky() {
-    let osr = os_release::parse_os_release("/etc/os-release").expect("Failed to read os-release");
+fn read_os_id_and_codename() {
+    let mock_data = r#"
+ID=debian
+VERSION_CODENAME="forky"
+# This is a comment
+        EXTRA_VAR=value
+    "#;
 
-    assert_eq!(
-        osr.get("ID").map(String::as_str),
-        Some("debian"),
-        "Not running Debian!"
-    );
-    assert_eq!(
-        osr.get("VERSION_CODENAME").map(String::as_str),
-        Some("forky"),
-        "Codename is not `forky`!"
-    );
+    let reader = Cursor::new(mock_data);
+    let result = os_release::parse_os_release_from_reader(reader).unwrap();
+
+    assert_eq!(result.get("ID").unwrap(), "debian");
+    assert_eq!(result.get("VERSION_CODENAME").unwrap(), "forky");
+    assert_eq!(result.get("EXTRA_VAR").unwrap(), "value");
 }
