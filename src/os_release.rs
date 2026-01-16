@@ -1,11 +1,18 @@
 use anyhow::Result;
 use std::collections::HashMap;
-use std::fs;
+use std::io::BufRead;
 
 pub fn parse_os_release(path: &str) -> Result<HashMap<String, String>> {
-    let text = fs::read_to_string(path)?;
+    let file = std::fs::File::open(path)?;
+    let reader = std::io::BufReader::new(file);
+    parse_os_release_from_reader(reader)
+}
+
+pub fn parse_os_release_from_reader<R: BufRead>(reader: R) -> Result<HashMap<String, String>> {
     let mut map = HashMap::new();
-    for raw in text.lines() {
+
+    for line_result in reader.lines() {
+        let raw = line_result?;
         let line = raw.trim();
         if line.is_empty() || line.starts_with('#') {
             continue;
