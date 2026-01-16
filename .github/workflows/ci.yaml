@@ -1,0 +1,46 @@
+name: Rust CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: aarch64-unknown-linux-gnu
+
+      - name: Install Cross-Linker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - name: Check Formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run Linting (Clippy)
+        run: cargo clippy -- -D warnings
+
+      - name: Build & Run Tests (Native x86_64)
+        # This runs your tests on the runner itself to make sure logic is sound
+        run: cargo test --verbose
+
+      - name: Build for ARM64
+        # This ensures the code compiles for your dev board
+        # We use --all-targets to include tests and examples
+        run: cargo build --target aarch64-unknown-linux-gnu --all-targets --verbose
+        env:
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
