@@ -50,9 +50,6 @@ impl I2cScanner for LinuxI2cScanner {
                             let errno = Errno::from_i32(code);
                             if errno == Errno::EBUSY {
                                 bound.push(addr);
-                            //} else if errno != Errno::ENODEV && errno != Errno::ENXIO {
-                            // ENODEV/ENXIO are common when a device just isn't there.
-                            // Anything else (like EACCES) is worth a warning.
                             } else {
                                 eprintln!("Unexpected Errno at 0x{:02x}: {}", addr, errno);
                             }
@@ -193,10 +190,10 @@ pub fn full_system_scan() -> Result<Vec<I2cBusReport>> {
         let scanner = LinuxI2cScanner { bus_id: bus_id };
         
         // 1. Live Hardware Probe
-        let (hw_unbound, hw_bound) = scanner.scan_hw_probe().unwrap_or_default();
+        let (hw_unbound, hw_bound) = scanner.scan_hw_probe()?;
         
         // 2. Sysfs check
-        let knl_detected = scanner.scan_sysfs().unwrap_or_default();
+        let knl_detected = scanner.scan_sysfs()?;
         
         reports.push(I2cBusReport {
             bus_path: bus_str,
