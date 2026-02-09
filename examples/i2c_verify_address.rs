@@ -4,11 +4,10 @@ use tux_validation::i2c::{LinuxI2cScanner, validate_bus};
 #[derive(Parser)]
 #[command(author, version, about = "Verifies I2C device addresses")]
 struct Args {
-
     /// Perform hardware probe (smbus_quick_write)
     #[arg(long)]
     hw_probe: bool,
-    
+
     /// I2C BUS ID (e.g., 0)
     #[arg(short, long)]
     bus_id: u8,
