@@ -6,7 +6,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 /// Finds all available i2c devices in /dev.
-/// 
+///
 /// Returns the list of found devices.
 pub fn discover_buses() -> Result<Vec<PathBuf>> {
     let mut buses = Vec::new();
@@ -41,8 +41,8 @@ pub struct LinuxI2cScanner {
 }
 
 impl I2cScanner for LinuxI2cScanner {
-    /// Scans a given I2C bus ID via hardware probe (smbus_write_quick). 
-    /// 
+    /// Scans a given I2C bus ID via hardware probe (smbus_write_quick).
+    ///
     /// Might potentially be disruptive for the bus.
     /// TODO: add some kind of safety check?
     fn scan_hw_probe(&self) -> Result<(Vec<u16>, Vec<u16>)> {
@@ -83,7 +83,7 @@ impl I2cScanner for LinuxI2cScanner {
         Ok((unbound, bound))
     }
 
-    /// Scans /sys/bus/i2c-xxx for kernel-recognised devices. 
+    /// Scans /sys/bus/i2c-xxx for kernel-recognised devices.
     fn scan_sysfs(&self) -> Result<Vec<u16>> {
         let mut detected = Vec::new();
 
@@ -109,7 +109,7 @@ pub struct I2cValidationResult {
 pub fn validate_bus(
     scanner: &impl I2cScanner,
     expected_addresses: &[u16],
-    enable_hw_probe: bool
+    enable_hw_probe: bool,
 ) -> Result<I2cValidationResult> {
     let (hw_unbound, hw_bound) = if enable_hw_probe {
         scanner.scan_hw_probe()?
@@ -201,7 +201,7 @@ pub fn get_device_info(bus_id: u32, addr: u16) -> String {
 }
 
 /// Performs full scan of I2C subsystem for the full range of addresses.
-/// 
+///
 /// Both sysfs scan and harware probes (optional, via smbus_quick_write) are performed.
 pub fn full_system_scan(enable_hw_probe: bool) -> Result<Vec<I2cBusReport>> {
     let busses = discover_buses()?;
