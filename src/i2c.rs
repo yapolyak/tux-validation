@@ -111,6 +111,8 @@ pub struct I2cValidationResult {
 /// Scan an I2C bus and check for specific device addresses.
 ///
 /// TODO: Uses scan_sysfs - can now upgrade to use udev
+///
+/// TODO: Uses scan_sysfs - can now upgrade to use udev
 pub fn validate_bus(
     scanner: &impl I2cScanner,
     expected_addresses: &[u16],
