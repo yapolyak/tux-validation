@@ -111,8 +111,6 @@ pub struct I2cValidationResult {
 /// Scan an I2C bus and check for specific device addresses.
 ///
 /// TODO: Uses scan_sysfs - can now upgrade to use udev
-///
-/// TODO: Uses scan_sysfs - can now upgrade to use udev
 pub fn validate_bus(
     scanner: &impl I2cScanner,
     expected_addresses: &[u16],
@@ -267,7 +265,7 @@ pub fn scan_i2c_subsystem_with_udev() -> Result<()> {
 /// Sweeps through udev records for I2C clients and returns a {bus: device} map.
 pub fn get_i2c_udev_map() -> Result<HashMap<u8, Vec<udev::Device>>> {
     let mut map = HashMap::new();
-    let mut enumerator = udev::Enumerator::new()?;
+    let mut enumerator = Enumerator::new()?;
     enumerator.match_subsystem("i2c")?;
     for device in enumerator.scan_devices()? {
         let name = device.sysname().to_str().unwrap_or("");
